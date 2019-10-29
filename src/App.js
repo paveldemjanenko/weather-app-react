@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
 import './App.css';
+import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'weather-icons/css/weather-icons.css';
+// import cities from 'cities.json';
 import Weather from './component/weather.component';
 import Form from './component/form.component';
 
@@ -73,24 +75,28 @@ class App extends Component {
     const city = e.target.elements.city.value;
     const country = e.target.elements.country.value;
 
-    if(city && country) {
-      const api_call = await fetch(`http://api.openweathermap.org/data/2.5/weather?q=${city},${country}&appid=${API_key}`)
-
-      const response = await api_call.json();
-
-      console.log(response);
+    try {
+      if(city && country) {
+        const api_call = await fetch(`http://api.openweathermap.org/data/2.5/weather?q=${city},${country}&appid=${API_key}`)
   
-      this.setState({
-        city: `${response.name}, ${response.sys.counttry}`,
-        celsius: this.calCelsius(response.main.temp),
-        temp_max: this.calCelsius(response.main.temp_max),
-        temp_min: this.calCelsius(response.main.temp_min),
-        description: response.weather[0].description,
-        error: false,
-        // icon: this.weatherIcon.Clouds,
-      });
-      this.getWeatherIcon(this.weatherIcon, response.weather[0].id);
-    }else{
+        const response = await api_call.json();
+  
+        console.log(response);
+    
+        this.setState({
+          city: `${response.name}, ${response.sys.country}`,
+          celsius: this.calCelsius(response.main.temp),
+          temp_max: this.calCelsius(response.main.temp_max),
+          temp_min: this.calCelsius(response.main.temp_min),
+          description: response.weather[0].description,
+          error: false,
+        });
+        this.getWeatherIcon(this.weatherIcon, response.weather[0].id);
+      }else{
+        this.setState({error: true});
+      };
+    }
+    catch(error) {
       this.setState({error: true});
     }
   };
@@ -111,17 +117,9 @@ class App extends Component {
         description={this.state.description}
         weatherIcon={this.state.icon}
         />
-    </div>
+      </div>
     );
   }
 };
-
-// function App() {
-//   return (
-//     <div className="App">
-//       <Weather />
-//     </div>
-//   );
-// }
 
 export default App;
